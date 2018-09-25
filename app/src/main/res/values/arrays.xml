@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="orderby">
+        <item>Recent</item>
+        <item>Relevant</item>
+    </string-array>
+    <string-array name="orderbyvalues">
+        <item>newest</item>
+        <item>relevance</item>
+    </string-array>
+
+    <!--<string-array name="orderdate">-->
+        <!--<item>Recent</item>-->
+        <!--<item>Relevant</item>-->
+    <!--</string-array>-->
+    <!--<string-array name="orderdatevalues">-->
+        <!--<item>newest</item>-->
+        <!--<item>relevance</item>-->
+    <!--</string-array>-->
+</resources>

@@ -1,0 +1,14 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/settings_title">
+
+    <ListPreference
+        android:key="orderby_preference"
+        android:title="Order By"
+        android:defaultValue="newest"/>
+
+    <ListPreference
+        android:key="orderdate_preference"
+        android:title="Order Date"
+        android:defaultValue="published" />
+
+</PreferenceScreen>

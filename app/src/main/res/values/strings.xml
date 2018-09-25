@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">newsapplist</string>
+    <string name="connecting">Connecting …</string>
+    <string name="no_connection_error">"Whoops! Please check if you're connected to Internet!"</string>
+    <string name="settings_menu_item">Settings</string>
+    <string name="settings_title">Search Filter</string>
+</resources>

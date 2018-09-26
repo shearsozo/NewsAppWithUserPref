@@ -22,13 +22,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-    implements SharedPreferences.OnSharedPreferenceChangeListener
+        implements SharedPreferences.OnSharedPreferenceChangeListener
 
 {
     private NewsListAdapter listAdapter;
     private SwipeRefreshLayout swipeContainer;
     private TextView errorMessage;
     private TextView connectingMessage;
+
+    private static final String ORDER_BY_QUERY_PARAM = "orderby";
+    private static final String ORDER_DATE_QUERY_PARAM = "orderdate";
+    private static final String ORDER_BY_PREFERENCE_KEY = "orderby_preference";
+    private static final String ORDER_DATE_PREFERENCE_KEY = "orderdate_preference";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,12 +57,10 @@ public class MainActivity extends AppCompatActivity
                 initLoader();
             }
         });
-//        initLoader();
     }
 
     @Override
     protected void onStart() {
-        System.out.println("Called on finish");
         super.onStart();
         initLoader();
     }
@@ -67,21 +70,20 @@ public class MainActivity extends AppCompatActivity
      * This function also sets up loaderCallBack events
      */
     private void initLoader() {
-        SharedPreferences orderByPreference = this.getSharedPreferences("orderby_preference", MODE_PRIVATE);
-        String orderBy = orderByPreference.getString("orderby_preference", "newest");
-        SharedPreferences orderDatePreference = this.getSharedPreferences("orderdate_preference", MODE_PRIVATE);
-        String orderDate = orderDatePreference.getString("orderdate_preference", "published");
+        SharedPreferences orderByPreference = this.getSharedPreferences(ORDER_BY_PREFERENCE_KEY, MODE_PRIVATE);
+        String orderBy = orderByPreference.getString(ORDER_BY_PREFERENCE_KEY, this.getResources().getString(R.string.default_order_by));
+        SharedPreferences orderDatePreference = this.getSharedPreferences(ORDER_DATE_PREFERENCE_KEY, MODE_PRIVATE);
+        String orderDate = orderDatePreference.getString(ORDER_DATE_PREFERENCE_KEY, this.getResources().getString(R.string.default_order_date));
         // Create a bundle called queryBundle
         Bundle queryBundle = new Bundle();
         // Call getSupportLoaderManager and store it in a LoaderManager variable
-        queryBundle.putString("orderby", orderBy);
-        queryBundle.putString("orderdate", orderDate);
+        queryBundle.putString(ORDER_BY_QUERY_PARAM, orderBy);
+        queryBundle.putString(ORDER_DATE_QUERY_PARAM, orderDate);
         LoaderManager loaderManager = getSupportLoaderManager();
         // Get our Loader by calling getLoader and passing the ID we specified
         int FETCH_NEWS_LOADER = 1313;
         Loader<String> loader = loaderManager.getLoader(FETCH_NEWS_LOADER);
 
-//        queryBundle.
         // If the Loader was null, initialize it. Else, restart it.
         LoaderManager.LoaderCallbacks<NewsItemsResponse<NewsItem>> loaderCallbacks = new LoaderManager.LoaderCallbacks<NewsItemsResponse<NewsItem>>() {
             @NonNull
@@ -134,13 +136,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-//        System.out.println("Called this event onSharedPreferenceChanged: ["+key+"]");
     }
 
 
     /**
      * @param <T> Type of the list of items that are generated as response
-     *
      */
     public static class NewsItemsResponse<T> {
         //Server response with newsItems
@@ -150,8 +150,6 @@ public class MainActivity extends AppCompatActivity
         private final Exception error;
 
         private final ResultsInfo resultsInfo;
-
-//        private final
 
         NewsItemsResponse(List<T> result, ResultsInfo resultsInfo, Exception error) {
             this.result = result;
@@ -183,8 +181,7 @@ public class MainActivity extends AppCompatActivity
         LoadAsyncTask(@NonNull Context context, Bundle args) {
             super(context);
             this.args = args;
-            this.datastore = new NetworkUtils(args.getString("orderby"), args.getString("orderdate"));
-
+            this.datastore = new NetworkUtils(args.getString(ORDER_BY_QUERY_PARAM), args.getString(ORDER_DATE_QUERY_PARAM));
         }
 
         @Override
@@ -196,7 +193,6 @@ public class MainActivity extends AppCompatActivity
         @Nullable
         @Override
         public NewsItemsResponse<NewsItem> loadInBackground() {
-
             if (datastore.hasMorePages()) {
                 return datastore.getNextPage();
             }
@@ -217,9 +213,8 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             Intent settingsIntent = new Intent(this, SettingsActivity.class);
             ResultsInfo resultsInfo = MainActivity.this.listAdapter.getResultsInfo();
-            if(resultsInfo != null) {
-                System.out.println("Adding pref [" +resultsInfo.getOrderBy()+ "]");
-                settingsIntent.putExtra("orderby", resultsInfo.getOrderBy());
+            if (resultsInfo != null) {
+                settingsIntent.putExtra(ORDER_BY_QUERY_PARAM, resultsInfo.getOrderBy());
             }
             startActivity(settingsIntent);
             return true;

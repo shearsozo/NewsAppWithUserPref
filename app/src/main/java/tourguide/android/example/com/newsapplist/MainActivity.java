@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity
     private TextView connectingMessage;
 
     private static final String ORDER_BY_QUERY_PARAM = "orderby";
+    public static final String PREFERENCE_INFO = "preference_info";
     private static final String ORDER_DATE_QUERY_PARAM = "orderdate";
     private static final String ORDER_BY_PREFERENCE_KEY = "orderby_preference";
     private static final String ORDER_DATE_PREFERENCE_KEY = "orderdate_preference";
@@ -102,7 +103,7 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     errorMessage.setVisibility(View.INVISIBLE);
                     MainActivity.this.listAdapter.clear(); //this won't work with pagination
-                    MainActivity.this.listAdapter.addNextPageToView(data.getResult(), data.getResultsInfo());
+                    MainActivity.this.listAdapter.addNextPageToView(data.getResult(), data.getResultsInfo(), data.getPreferenceData());
                     MainActivity.this.listAdapter.notifyDataSetChanged();
                     swipeContainer.setRefreshing(false);
                 }
@@ -150,10 +151,12 @@ public class MainActivity extends AppCompatActivity
         private final Exception error;
 
         private final ResultsInfo resultsInfo;
+        private final PreferencesData preferenceData;
 
-        NewsItemsResponse(List<T> result, ResultsInfo resultsInfo, Exception error) {
+        NewsItemsResponse(List<T> result, ResultsInfo resultsInfo, PreferencesData preferencesData, Exception error) {
             this.result = result;
             this.resultsInfo = resultsInfo;
+            this.preferenceData = preferencesData;
             this.error = error;
         }
 
@@ -167,6 +170,10 @@ public class MainActivity extends AppCompatActivity
 
         public ResultsInfo getResultsInfo() {
             return resultsInfo;
+        }
+
+        public PreferencesData getPreferenceData() {
+            return preferenceData;
         }
     }
 
@@ -196,7 +203,7 @@ public class MainActivity extends AppCompatActivity
             if (datastore.hasMorePages()) {
                 return datastore.getNextPage();
             }
-            return new MainActivity.NewsItemsResponse<>(new ArrayList<NewsItem>(), null, null);
+            return new MainActivity.NewsItemsResponse<>(new ArrayList<NewsItem>(), null, null, null);
         }
     }
 
@@ -213,8 +220,10 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             Intent settingsIntent = new Intent(this, SettingsActivity.class);
             ResultsInfo resultsInfo = MainActivity.this.listAdapter.getResultsInfo();
+            PreferencesData preferencesData = MainActivity.this.listAdapter.getPreferencesData();
             if (resultsInfo != null) {
                 settingsIntent.putExtra(ORDER_BY_QUERY_PARAM, resultsInfo.getOrderBy());
+                settingsIntent.putExtra(PREFERENCE_INFO, preferencesData);
             }
             startActivity(settingsIntent);
             return true;

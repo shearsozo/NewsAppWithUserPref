@@ -22,6 +22,7 @@ public class SettingsActivity extends PreferenceActivity {
         addPreferencesFromResource(R.xml.settings_main);
         String currentOrderByPreference = PreferenceManager.getDefaultSharedPreferences(this).getString("orderby_preference", getIntent().getStringExtra("orderby"));
 
+        getIntent().getParcelableExtra(MainActivity.PREFERENCE_INFO);
         CharSequence[] entries = {"Relevance", "Newest"};
         CharSequence[] entryValues = {"relevance", "newest"};
         System.out.println("Current Preference Value: [" + currentOrderByPreference + "]");

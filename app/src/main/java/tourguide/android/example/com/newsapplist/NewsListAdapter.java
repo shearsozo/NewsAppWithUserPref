@@ -21,6 +21,7 @@ class NewsListAdapter extends BaseAdapter {
     private final Context context;
     private List<NewsItem> newsItems;
     private ResultsInfo resultsInfo;
+    private PreferencesData preferencesData;
 
     NewsListAdapter(Context context) {
         this.context = context;
@@ -32,9 +33,10 @@ class NewsListAdapter extends BaseAdapter {
      * @param nextPageItems - Adds all the items from input list to the list of items to be shown in the view
      * @param resultsInfo - Metadata of the results such as page count and order by value etc.
      */
-    public void addNextPageToView(List<NewsItem> nextPageItems, ResultsInfo resultsInfo) {
+    public void addNextPageToView(List<NewsItem> nextPageItems, ResultsInfo resultsInfo, PreferencesData preferencesData) {
         newsItems.addAll(nextPageItems);
         this.resultsInfo = resultsInfo;
+        this.preferencesData = preferencesData;
     }
 
     /**
@@ -108,6 +110,10 @@ class NewsListAdapter extends BaseAdapter {
 
     public void setResultsInfo(ResultsInfo resultsInfo) {
         this.resultsInfo = resultsInfo;
+    }
+
+    public PreferencesData getPreferencesData() {
+        return preferencesData;
     }
 
     public class ViewHolder {

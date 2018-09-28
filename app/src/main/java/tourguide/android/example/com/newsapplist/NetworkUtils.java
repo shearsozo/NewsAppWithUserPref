@@ -22,13 +22,16 @@ import java.util.List;
 class NetworkUtils {
 
     // URL from which HTTP Request is received
-    private static final String GAURDIAN_DATA_URL = "https://content.guardianapis.com/search?q=debate&tag=politics/politics&from-date=2014-01-01&api-key=test&show-tags=contributor";
+    private static final String GAURDIAN_DATA_URL = "https://content.guardianapis.com/search?q=debate&from-date=2014-01-01&api-key=test&show-tags=contributor";
+    private static final String GAURDIAN_SECTIONS_URL = "https://content.guardianapis.com/sections?api-key=test";
     private String orderDate = null;
     private ResultsInfo resultsInfo;
+    private PreferencesData preferencesData;
     private String orderBy = null;
 
     NetworkUtils(String orderByPreference, String orderdate) {
         this.resultsInfo = new ResultsInfo();
+        this.preferencesData = new PreferencesData();
         this.orderBy = orderByPreference;
         this.orderDate = orderdate;
     }
@@ -81,22 +84,23 @@ class NetworkUtils {
                     newsJSONString = sb.toString();
                     break;
                 case HttpURLConnection.HTTP_UNAVAILABLE:
-                    return new MainActivity.NewsItemsResponse<NewsItem>(null, resultsInfo, new NewsItemFetchException("Server unavailable. Please try again in sometime!"));
+                    return new MainActivity.NewsItemsResponse<NewsItem>(null, resultsInfo, null, new NewsItemFetchException("Server unavailable. Please try again in sometime!"));
                 case HttpURLConnection.HTTP_INTERNAL_ERROR:
-                    return new MainActivity.NewsItemsResponse<NewsItem>(null, resultsInfo, new NewsItemFetchException("Something went wrong! Please try again in sometime!"));
+                    return new MainActivity.NewsItemsResponse<NewsItem>(null, resultsInfo, null, new NewsItemFetchException("Something went wrong! Please try again in sometime!"));
                 case 429:
-                    return new MainActivity.NewsItemsResponse<NewsItem>(null, resultsInfo, new NewsItemFetchException("Server API rate limit exceeded. Please try again in sometime!"));
+                    return new MainActivity.NewsItemsResponse<NewsItem>(null, resultsInfo, null, new NewsItemFetchException("Server API rate limit exceeded. Please try again in sometime!"));
                 default:
                     System.out.println("Received a non success response: [" + responseCode + "]");
                     break;
             }
+            preferencesData.clear();
             List<NewsItem> newsItems = parseJSON(newsJSONString);
-            return new MainActivity.NewsItemsResponse<NewsItem>(newsItems, resultsInfo, null);
+            return new MainActivity.NewsItemsResponse<NewsItem>(newsItems, resultsInfo, preferencesData, null);
         } catch (UnknownHostException e) {
-            return new MainActivity.NewsItemsResponse<NewsItem>(null, resultsInfo, e);
+            return new MainActivity.NewsItemsResponse<NewsItem>(null, resultsInfo, null, e);
         } catch (IOException e) {
             e.printStackTrace();
-            return new MainActivity.NewsItemsResponse<NewsItem>(null, resultsInfo, e);
+            return new MainActivity.NewsItemsResponse<NewsItem>(null, resultsInfo, null, e);
         } finally {
             // close the reader and http connections
             if (reader != null) {
@@ -135,10 +139,13 @@ class NetworkUtils {
             JSONArray newsItemResultsArray = httpResponse.getJSONArray("results");
             for (int i = 0; i < newsItemResultsArray.length(); i++) {
                 JSONObject newsItemJSON = newsItemResultsArray.getJSONObject(i);
+                String sectionId = newsItemJSON.getString("sectionId");
+                String sectionName = newsItemJSON.getString("sectionName");
+                preferencesData.addSection(sectionId, sectionName);
                 NewsItem item = new NewsItem(newsItemJSON.getString("id"),
                         newsItemJSON.getString("type"),
-                        newsItemJSON.getString("sectionId"),
-                        newsItemJSON.getString("sectionName"),
+                        sectionId,
+                        sectionName,
                         newsItemJSON.getString("webPublicationDate"),
                         newsItemJSON.getString("webTitle"),
                         newsItemJSON.getString("webUrl"),

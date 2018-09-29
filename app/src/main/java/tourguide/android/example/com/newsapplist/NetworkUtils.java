@@ -22,18 +22,19 @@ import java.util.List;
 class NetworkUtils {
 
     // URL from which HTTP Request is received
-    private static final String GAURDIAN_DATA_URL = "https://content.guardianapis.com/search?q=debate&from-date=2014-01-01&api-key=test&show-tags=contributor";
-    private static final String GAURDIAN_SECTIONS_URL = "https://content.guardianapis.com/sections?api-key=test";
+    private static final String GAURDIAN_DATA_URL = "https://content.guardianapis.com/search?q=debate&from-date=2014-01-01&api-key=a85b461a-aecc-424e-a1b3-7fe8bed68ae2&show-tags=contributor";
+    private static final String GAURDIAN_SECTIONS_URL = "https://content.guardianapis.com/sections?api-key=a85b461a-aecc-424e-a1b3-7fe8bed68ae2";
+    private String sectionNamePreference = null;
     private String orderDate = null;
     private ResultsInfo resultsInfo;
-    private PreferencesData preferencesData;
+    private static PreferencesData preferencesData = new PreferencesData();
     private String orderBy = null;
 
-    NetworkUtils(String orderByPreference, String orderdate) {
+    NetworkUtils(String orderByPreference, String orderdate, String sectionNamePreference) {
         this.resultsInfo = new ResultsInfo();
-        this.preferencesData = new PreferencesData();
         this.orderBy = orderByPreference;
         this.orderDate = orderdate;
+        this.sectionNamePreference = sectionNamePreference;
     }
 
     private MainActivity.NewsItemsResponse<NewsItem> getResponseFromHttpUrl() {
@@ -55,6 +56,10 @@ class NetworkUtils {
             builder.appendQueryParameter("order-date", orderDate);
         } else {
             builder.appendQueryParameter("order-date", "published");
+        }
+
+        if(sectionNamePreference != null) {
+            builder.appendQueryParameter("section", sectionNamePreference);
         }
         Uri builtURI = builder.build();
 
@@ -116,6 +121,67 @@ class NetworkUtils {
         }
     }
 
+    public static void getSectionsFromHttpUrl() {
+
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+        String sectionsJSONString = null;
+
+        // page - attribute returns the results of the given page number
+        Uri.Builder builder = Uri.parse(GAURDIAN_SECTIONS_URL).buildUpon();
+
+        Uri builtURI = builder.build();
+
+        try {
+            URL requestURL = new URL(builtURI.toString());
+            urlConnection = (HttpURLConnection) requestURL.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+            int responseCode = urlConnection.getResponseCode();
+            switch (responseCode) {
+                case HttpURLConnection.HTTP_OK:
+                    InputStream inputStream = urlConnection.getInputStream();
+                    StringBuilder sb = new StringBuilder();
+                    if (inputStream == null) {
+                        // Nothing to do.
+                        return;
+                    }
+                    reader = new BufferedReader(new InputStreamReader(inputStream));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line).append("\n");
+                    }
+                    if (sb.length() == 0) {
+                        // Stream was empty.  No point in parsing.
+                        return;
+                    }
+                    sectionsJSONString = sb.toString();
+                    break;
+                default:
+                    System.out.println("Received a non success response: [" + responseCode + "]");
+                    break;
+            }
+            preferencesData.clear();
+            parseSections(sectionsJSONString);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // close the reader and http connections
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+        }
+    }
+
     /**
      * 
      * @param newsJSONString - The response JSON string received from the server
@@ -161,6 +227,24 @@ class NetworkUtils {
         }
         return newsItems;
     }
+
+
+    private static void parseSections(String sectionsJSONString) {
+        try {
+            JSONObject newsResponse = new JSONObject(sectionsJSONString);
+            JSONObject httpResponse = newsResponse.getJSONObject("response");
+            JSONArray sectionsResultsArray = httpResponse.getJSONArray("results");
+            for (int i = 0; i < sectionsResultsArray.length(); i++) {
+                JSONObject newsItemJSON = sectionsResultsArray.getJSONObject(i);
+                String sectionId = newsItemJSON.getString("id");
+                String sectionName = newsItemJSON.getString("webTitle");
+                preferencesData.addSection(sectionId, sectionName);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * 

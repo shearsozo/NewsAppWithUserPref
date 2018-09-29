@@ -33,13 +33,27 @@ public class MainActivity extends AppCompatActivity
     private static final String ORDER_BY_QUERY_PARAM = "orderby";
     public static final String PREFERENCE_INFO = "preference_info";
     private static final String ORDER_DATE_QUERY_PARAM = "orderdate";
-    private static final String ORDER_BY_PREFERENCE_KEY = "orderby_preference";
-    private static final String ORDER_DATE_PREFERENCE_KEY = "orderdate_preference";
+    private static final String SECTIONNAME_QUERY_PARAM = "sectionname";
+    public static final String ORDER_BY_PREFERENCE_KEY = "orderby_preference";
+    public static final String ORDER_DATE_PREFERENCE_KEY = "orderdate_preference";
+    public static final String SECTIONNAME_PREFERENCE_KEY = "sectionname_preference";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        SharedPreferences sectionNamePreference = this.getSharedPreferences(SECTIONNAME_PREFERENCE_KEY, MODE_PRIVATE);
+//        sectionNamePreference.edit().clear();
+//        sectionNamePreference.edit().commit();
+//        SharedPreferences orderByPreference = this.getSharedPreferences(ORDER_BY_PREFERENCE_KEY, MODE_PRIVATE);
+//        orderByPreference.edit().clear();
+//        orderByPreference.edit().commit();
+//        SharedPreferences orderDatePreference = this.getSharedPreferences(ORDER_DATE_PREFERENCE_KEY, MODE_PRIVATE);
+//        orderDatePreference.edit().clear();
+//        orderDatePreference.edit().commit();
+
+
         //error messages will be show in this textview
         errorMessage = (TextView) findViewById(R.id.error_message);
 
@@ -71,6 +85,8 @@ public class MainActivity extends AppCompatActivity
      * This function also sets up loaderCallBack events
      */
     private void initLoader() {
+        SharedPreferences sectionNamePreference = this.getSharedPreferences(SECTIONNAME_PREFERENCE_KEY, MODE_PRIVATE);
+        String sectionName = sectionNamePreference.getString(SECTIONNAME_PREFERENCE_KEY, null);
         SharedPreferences orderByPreference = this.getSharedPreferences(ORDER_BY_PREFERENCE_KEY, MODE_PRIVATE);
         String orderBy = orderByPreference.getString(ORDER_BY_PREFERENCE_KEY, this.getResources().getString(R.string.default_order_by));
         SharedPreferences orderDatePreference = this.getSharedPreferences(ORDER_DATE_PREFERENCE_KEY, MODE_PRIVATE);
@@ -80,6 +96,7 @@ public class MainActivity extends AppCompatActivity
         // Call getSupportLoaderManager and store it in a LoaderManager variable
         queryBundle.putString(ORDER_BY_QUERY_PARAM, orderBy);
         queryBundle.putString(ORDER_DATE_QUERY_PARAM, orderDate);
+        queryBundle.putString(SECTIONNAME_QUERY_PARAM, sectionName);
         LoaderManager loaderManager = getSupportLoaderManager();
         // Get our Loader by calling getLoader and passing the ID we specified
         int FETCH_NEWS_LOADER = 1313;
@@ -188,7 +205,8 @@ public class MainActivity extends AppCompatActivity
         LoadAsyncTask(@NonNull Context context, Bundle args) {
             super(context);
             this.args = args;
-            this.datastore = new NetworkUtils(args.getString(ORDER_BY_QUERY_PARAM), args.getString(ORDER_DATE_QUERY_PARAM));
+            NetworkUtils.getSectionsFromHttpUrl();
+            this.datastore = new NetworkUtils(args.getString(ORDER_BY_QUERY_PARAM), args.getString(ORDER_DATE_QUERY_PARAM), args.getString(SECTIONNAME_QUERY_PARAM));
         }
 
         @Override

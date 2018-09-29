@@ -2,6 +2,11 @@
     android:title="@string/settings_title">
 
     <ListPreference
+        android:key="sectionname_preference"
+        android:title="Section"
+        />
+
+    <ListPreference
         android:key="orderby_preference"
         android:title="Order By"
         android:defaultValue="newest"/>

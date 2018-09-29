@@ -2,11 +2,16 @@ package tourguide.android.example.com.newsapplist;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+
+import static tourguide.android.example.com.newsapplist.MainActivity.ORDER_BY_PREFERENCE_KEY;
+import static tourguide.android.example.com.newsapplist.MainActivity.ORDER_DATE_PREFERENCE_KEY;
+import static tourguide.android.example.com.newsapplist.MainActivity.SECTIONNAME_PREFERENCE_KEY;
 
 /**
  * Setting Activity helps narrow down the search results
@@ -20,16 +25,21 @@ public class SettingsActivity extends PreferenceActivity {
         setContentView(R.layout.settings_activity);
 
         addPreferencesFromResource(R.xml.settings_main);
-        String currentOrderByPreference = PreferenceManager.getDefaultSharedPreferences(this).getString("orderby_preference", getIntent().getStringExtra("orderby"));
+        String currentOrderByPreference = PreferenceManager.getDefaultSharedPreferences(this).getString(ORDER_BY_PREFERENCE_KEY, getIntent().getStringExtra("orderby"));
 
-        getIntent().getParcelableExtra(MainActivity.PREFERENCE_INFO);
+        PreferencesData preferenceData = getIntent().getParcelableExtra(MainActivity.PREFERENCE_INFO);
+        CharSequence[] sectionNameEntries = preferenceData.getSectionNames().toArray(new CharSequence[preferenceData.getSectionNames().size()]);
+        CharSequence[] sectionNameValues = preferenceData.getSectionIds().toArray(new CharSequence[preferenceData.getSectionIds().size()]);
+
+        handleSearchPreference(currentOrderByPreference, SECTIONNAME_PREFERENCE_KEY, sectionNameEntries, sectionNameValues);
+
         CharSequence[] entries = {"Relevance", "Newest"};
         CharSequence[] entryValues = {"relevance", "newest"};
         System.out.println("Current Preference Value: [" + currentOrderByPreference + "]");
 
         handleSearchPreference(currentOrderByPreference, "orderby_preference", entries, entryValues);
 
-        String currentOrderDatePreference = PreferenceManager.getDefaultSharedPreferences(this).getString("orderdate_preference", getIntent().getStringExtra("orderdate"));
+        String currentOrderDatePreference = PreferenceManager.getDefaultSharedPreferences(this).getString(ORDER_DATE_PREFERENCE_KEY, getIntent().getStringExtra("orderdate"));
 
         CharSequence[] entries2 = {"Published", "News Paper Edition", "Last Modified"};
         CharSequence[] entryValues2 = {"published", "newspaper-edition", "last-modified"};

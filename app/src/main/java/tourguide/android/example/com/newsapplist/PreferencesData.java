@@ -16,6 +16,8 @@ public class PreferencesData implements Parcelable {
     public PreferencesData() {
         this.sectionNames = new ArrayList<>();
         this.sectionIds = new ArrayList<>();
+        this.sectionIds.add("all");
+        this.sectionNames.add("All");
     }
 
     public PreferencesData(Parcel source) {

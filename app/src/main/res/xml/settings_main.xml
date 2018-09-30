@@ -4,6 +4,7 @@
     <ListPreference
         android:key="sectionname_preference"
         android:title="Section"
+        android:defaultValue="all"
         />
 
     <ListPreference

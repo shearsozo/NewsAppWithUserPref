@@ -27,7 +27,7 @@ class NetworkUtils {
     private String sectionNamePreference = null;
     private String orderDate = null;
     private ResultsInfo resultsInfo;
-    private static PreferencesData preferencesData = new PreferencesData();
+    private static final PreferencesData preferencesData = new PreferencesData();
     private String orderBy = null;
 
     NetworkUtils(String orderByPreference, String orderdate, String sectionNamePreference) {
@@ -58,7 +58,7 @@ class NetworkUtils {
             builder.appendQueryParameter("order-date", "published");
         }
 
-        if(sectionNamePreference != null) {
+        if(sectionNamePreference != null && !"all".equalsIgnoreCase(sectionNamePreference)) {
             builder.appendQueryParameter("section", sectionNamePreference);
         }
         Uri builtURI = builder.build();
@@ -98,7 +98,7 @@ class NetworkUtils {
                     System.out.println("Received a non success response: [" + responseCode + "]");
                     break;
             }
-            preferencesData.clear();
+//            preferencesData.clear();
             List<NewsItem> newsItems = parseJSON(newsJSONString);
             return new MainActivity.NewsItemsResponse<NewsItem>(newsItems, resultsInfo, preferencesData, null);
         } catch (UnknownHostException e) {
@@ -106,67 +106,6 @@ class NetworkUtils {
         } catch (IOException e) {
             e.printStackTrace();
             return new MainActivity.NewsItemsResponse<NewsItem>(null, resultsInfo, null, e);
-        } finally {
-            // close the reader and http connections
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        }
-    }
-
-    public static void getSectionsFromHttpUrl() {
-
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-        String sectionsJSONString = null;
-
-        // page - attribute returns the results of the given page number
-        Uri.Builder builder = Uri.parse(GAURDIAN_SECTIONS_URL).buildUpon();
-
-        Uri builtURI = builder.build();
-
-        try {
-            URL requestURL = new URL(builtURI.toString());
-            urlConnection = (HttpURLConnection) requestURL.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-            int responseCode = urlConnection.getResponseCode();
-            switch (responseCode) {
-                case HttpURLConnection.HTTP_OK:
-                    InputStream inputStream = urlConnection.getInputStream();
-                    StringBuilder sb = new StringBuilder();
-                    if (inputStream == null) {
-                        // Nothing to do.
-                        return;
-                    }
-                    reader = new BufferedReader(new InputStreamReader(inputStream));
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        sb.append(line).append("\n");
-                    }
-                    if (sb.length() == 0) {
-                        // Stream was empty.  No point in parsing.
-                        return;
-                    }
-                    sectionsJSONString = sb.toString();
-                    break;
-                default:
-                    System.out.println("Received a non success response: [" + responseCode + "]");
-                    break;
-            }
-            preferencesData.clear();
-            parseSections(sectionsJSONString);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         } finally {
             // close the reader and http connections
             if (reader != null) {
@@ -227,24 +166,6 @@ class NetworkUtils {
         }
         return newsItems;
     }
-
-
-    private static void parseSections(String sectionsJSONString) {
-        try {
-            JSONObject newsResponse = new JSONObject(sectionsJSONString);
-            JSONObject httpResponse = newsResponse.getJSONObject("response");
-            JSONArray sectionsResultsArray = httpResponse.getJSONArray("results");
-            for (int i = 0; i < sectionsResultsArray.length(); i++) {
-                JSONObject newsItemJSON = sectionsResultsArray.getJSONObject(i);
-                String sectionId = newsItemJSON.getString("id");
-                String sectionName = newsItemJSON.getString("webTitle");
-                preferencesData.addSection(sectionId, sectionName);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     /**
      * 

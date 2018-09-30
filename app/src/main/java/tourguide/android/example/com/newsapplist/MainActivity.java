@@ -205,7 +205,6 @@ public class MainActivity extends AppCompatActivity
         LoadAsyncTask(@NonNull Context context, Bundle args) {
             super(context);
             this.args = args;
-            NetworkUtils.getSectionsFromHttpUrl();
             this.datastore = new NetworkUtils(args.getString(ORDER_BY_QUERY_PARAM), args.getString(ORDER_DATE_QUERY_PARAM), args.getString(SECTIONNAME_QUERY_PARAM));
         }
 

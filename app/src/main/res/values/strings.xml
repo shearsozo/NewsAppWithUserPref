@@ -6,4 +6,7 @@
     <string name="settings_title">Search Filter</string>
     <string name="default_order_by">newest</string>
     <string name="default_order_date">published</string>
+    <string name="orderby_preference">orderby_preference</string>
+    <string name="orderdate_preference">orderdate_preference</string>
+    <string name="section_preference">sectionname_preference</string>
 </resources>

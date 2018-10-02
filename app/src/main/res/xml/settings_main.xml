@@ -6,21 +6,14 @@
         android:key="sectionname_preference"
         android:title="Section" />
 
-    <!--<TextView android:id="@+id/sectionname_selection" />-->
-
-
     <ListPreference
         android:defaultValue="newest"
         android:key="orderby_preference"
         android:title="Order By" />
 
-    <!--<TextView android:id="@+id/orderby_selection" />-->
-
     <ListPreference
         android:defaultValue="published"
         android:key="orderdate_preference"
         android:title="Order Date" />
-
-    <!--<TextView android:id="@+id/orderdate_selection" />-->
 
 </PreferenceScreen>

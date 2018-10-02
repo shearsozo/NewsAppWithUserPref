@@ -43,18 +43,6 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        SharedPreferences sectionNamePreference = this.getSharedPreferences(SECTIONNAME_PREFERENCE_KEY, MODE_PRIVATE);
-//        sectionNamePreference.edit().clear();
-//        sectionNamePreference.edit().commit();
-//        SharedPreferences orderByPreference = this.getSharedPreferences(ORDER_BY_PREFERENCE_KEY, MODE_PRIVATE);
-//        orderByPreference.edit().clear();
-//        orderByPreference.edit().commit();
-//        SharedPreferences orderDatePreference = this.getSharedPreferences(ORDER_DATE_PREFERENCE_KEY, MODE_PRIVATE);
-//        orderDatePreference.edit().clear();
-//        orderDatePreference.edit().commit();
-
-
         //error messages will be show in this textview
         errorMessage = (TextView) findViewById(R.id.error_message);
 
@@ -87,13 +75,10 @@ public class MainActivity extends AppCompatActivity
      */
     private void initLoader() {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-//        SharedPreferences sectionNamePreference = this.getSharedPreferences(SECTIONNAME_PREFERENCE_KEY, MODE_PRIVATE);
         String sectionName = sharedPrefs.getString(SECTIONNAME_PREFERENCE_KEY, null);
-//        SharedPreferences orderByPreference = this.getSharedPreferences(ORDER_BY_PREFERENCE_KEY, MODE_PRIVATE);
         String orderBy = sharedPrefs.getString(ORDER_BY_PREFERENCE_KEY, this.getResources().getString(R.string.default_order_by));
-//        SharedPreferences orderDatePreference = this.getSharedPreferences(ORDER_DATE_PREFERENCE_KEY, MODE_PRIVATE);
         String orderDate = sharedPrefs.getString(ORDER_DATE_PREFERENCE_KEY, this.getResources().getString(R.string.default_order_date));
+
         // Create a bundle called queryBundle
         Bundle queryBundle = new Bundle();
         // Call getSupportLoaderManager and store it in a LoaderManager variable
@@ -158,7 +143,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
     }
-
 
     /**
      * @param <T> Type of the list of items that are generated as response
@@ -227,7 +211,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -250,5 +233,4 @@ public class MainActivity extends AppCompatActivity
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

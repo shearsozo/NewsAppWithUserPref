@@ -26,14 +26,12 @@ public class SettingsActivity extends PreferenceActivity {
         setContentView(R.layout.settings_activity);
     }
 
-
     public static class NewsAppPreferenceFragment extends PreferenceFragment
             implements Preference.OnPreferenceChangeListener {
 
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-
 
             addPreferencesFromResource(R.xml.settings_main);
             String currentOrderByPreference = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ORDER_BY_PREFERENCE_KEY, getActivity().getIntent().getStringExtra("orderby"));
@@ -64,7 +62,6 @@ public class SettingsActivity extends PreferenceActivity {
 
         private void bindPreferenceSummaryToValue(Preference preference) {
             preference.setOnPreferenceChangeListener(this);
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
             String preferenceString = ((ListPreference) preference).getEntry().toString();
             onPreferenceChange(preference, preferenceString);
         }
@@ -93,29 +90,9 @@ public class SettingsActivity extends PreferenceActivity {
         private void handleSearchPreference(String currentPreference, final String preferenceKey,
                                             CharSequence[] entries, CharSequence[] entryValues) {
             ListPreference sharedPreference = (ListPreference) findPreference(preferenceKey);
-
-
             sharedPreference.setEntries(entries);
             sharedPreference.setEntryValues(entryValues);
-
             sharedPreference.setDefaultValue(currentPreference);
-
-            // When the user changes the preference update sharedpreferences and show parent activity
-//            Preference.OnPreferenceChangeListener onPreferenceChangeListener = new Preference.OnPreferenceChangeListener() {
-//
-//                @Override
-//                public boolean onPreferenceChange(Preference preference, Object newValue) {
-//                    String sortOrder = (String) newValue;
-//                    SharedPreferences sharedPreferences = SettingsActivity.this.getSharedPreferences(preferenceKey, MODE_PRIVATE);
-//                    SharedPreferences.Editor editor = sharedPreferences.edit();
-//                    editor.putString(preferenceKey, sortOrder);
-//                    editor.apply();
-//                    finish();
-//                    return true;
-//                }
-//            };
-//            sharedPreference.setOnPreferenceChangeListener(onPreferenceChangeListener);
         }
-
     }
 }

@@ -23,7 +23,6 @@ class NetworkUtils {
 
     // URL from which HTTP Request is received
     private static final String GAURDIAN_DATA_URL = "https://content.guardianapis.com/search?q=debate&from-date=2014-01-01&api-key=a85b461a-aecc-424e-a1b3-7fe8bed68ae2&show-tags=contributor";
-    private static final String GAURDIAN_SECTIONS_URL = "https://content.guardianapis.com/sections?api-key=a85b461a-aecc-424e-a1b3-7fe8bed68ae2";
     private String sectionNamePreference = null;
     private String orderDate = null;
     private ResultsInfo resultsInfo;
@@ -38,7 +37,6 @@ class NetworkUtils {
     }
 
     private MainActivity.NewsItemsResponse<NewsItem> getResponseFromHttpUrl() {
-
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String newsJSONString = null;
@@ -98,7 +96,6 @@ class NetworkUtils {
                     System.out.println("Received a non success response: [" + responseCode + "]");
                     break;
             }
-//            preferencesData.clear();
             List<NewsItem> newsItems = parseJSON(newsJSONString);
             return new MainActivity.NewsItemsResponse<NewsItem>(newsItems, resultsInfo, preferencesData, null);
         } catch (UnknownHostException e) {
@@ -136,10 +133,8 @@ class NetworkUtils {
             JSONObject newsResponse = new JSONObject(newsJSONString);
             JSONObject httpResponse = newsResponse.getJSONObject("response");
             if (isFirstPage()) {
-//                pageSize = httpResponse.getInt("pageSize");
                 resultsInfo.setTotalPages(httpResponse.getInt("pages"));
                 resultsInfo.setOrderBy(httpResponse.getString("orderBy"));
-//                totalNewsStories = httpResponse.getInt("total"); //Unused as of now
             }
             JSONArray newsItemResultsArray = httpResponse.getJSONArray("results");
             for (int i = 0; i < newsItemResultsArray.length(); i++) {

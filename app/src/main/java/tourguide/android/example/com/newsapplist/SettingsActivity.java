@@ -24,7 +24,6 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
-
     }
 
 
@@ -47,17 +46,13 @@ public class SettingsActivity extends PreferenceActivity {
 
             CharSequence[] entries = {"Relevance", "Newest"};
             CharSequence[] entryValues = {"relevance", "newest"};
-            System.out.println("Current Preference Value: [" + currentOrderByPreference + "]");
 
             handleSearchPreference(currentOrderByPreference, "orderby_preference", entries, entryValues);
-
             String currentOrderDatePreference = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ORDER_DATE_PREFERENCE_KEY, getActivity().getIntent().getStringExtra("orderdate"));
-
             CharSequence[] entries2 = {"Published", "News Paper Edition", "Last Modified"};
             CharSequence[] entryValues2 = {"published", "newspaper-edition", "last-modified"};
 
             handleSearchPreference(currentOrderDatePreference, "orderdate_preference", entries2, entryValues2);
-            addPreferencesFromResource(R.xml.settings_main);
 
             Preference orderByPref = findPreference(getString(R.string.orderby_preference));
             bindPreferenceSummaryToValue(orderByPref);
@@ -70,13 +65,21 @@ public class SettingsActivity extends PreferenceActivity {
         private void bindPreferenceSummaryToValue(Preference preference) {
             preference.setOnPreferenceChangeListener(this);
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
-            String preferenceString = preferences.getString(preference.getKey(), "");
+            String preferenceString = ((ListPreference) preference).getEntry().toString();
             onPreferenceChange(preference, preferenceString);
         }
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
+            ListPreference listPreference = (ListPreference) preference;
+            int index = listPreference.findIndexOfValue(stringValue);
+
+            CharSequence[] entries = listPreference.getEntries();
+
+            if(index >= 0) {
+                stringValue = entries[index].toString();
+            }
             preference.setSummary(stringValue);
             return true;
         }

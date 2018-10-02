@@ -3,6 +3,7 @@ package tourguide.android.example.com.newsapplist;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -85,12 +86,14 @@ public class MainActivity extends AppCompatActivity
      * This function also sets up loaderCallBack events
      */
     private void initLoader() {
-        SharedPreferences sectionNamePreference = this.getSharedPreferences(SECTIONNAME_PREFERENCE_KEY, MODE_PRIVATE);
-        String sectionName = sectionNamePreference.getString(SECTIONNAME_PREFERENCE_KEY, null);
-        SharedPreferences orderByPreference = this.getSharedPreferences(ORDER_BY_PREFERENCE_KEY, MODE_PRIVATE);
-        String orderBy = orderByPreference.getString(ORDER_BY_PREFERENCE_KEY, this.getResources().getString(R.string.default_order_by));
-        SharedPreferences orderDatePreference = this.getSharedPreferences(ORDER_DATE_PREFERENCE_KEY, MODE_PRIVATE);
-        String orderDate = orderDatePreference.getString(ORDER_DATE_PREFERENCE_KEY, this.getResources().getString(R.string.default_order_date));
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+//        SharedPreferences sectionNamePreference = this.getSharedPreferences(SECTIONNAME_PREFERENCE_KEY, MODE_PRIVATE);
+        String sectionName = sharedPrefs.getString(SECTIONNAME_PREFERENCE_KEY, null);
+//        SharedPreferences orderByPreference = this.getSharedPreferences(ORDER_BY_PREFERENCE_KEY, MODE_PRIVATE);
+        String orderBy = sharedPrefs.getString(ORDER_BY_PREFERENCE_KEY, this.getResources().getString(R.string.default_order_by));
+//        SharedPreferences orderDatePreference = this.getSharedPreferences(ORDER_DATE_PREFERENCE_KEY, MODE_PRIVATE);
+        String orderDate = sharedPrefs.getString(ORDER_DATE_PREFERENCE_KEY, this.getResources().getString(R.string.default_order_date));
         // Create a bundle called queryBundle
         Bundle queryBundle = new Bundle();
         // Call getSupportLoaderManager and store it in a LoaderManager variable
